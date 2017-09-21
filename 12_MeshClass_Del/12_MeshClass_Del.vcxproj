@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{9557AEB2-A186-4645-B8D0-678D133C2EFA}</ProjectGuid>
-    <RootNamespace>E07 - ARBB</RootNamespace>
-    <ProjectName>E07 - ARBB</ProjectName>
+    <ProjectGuid>{D284823E-1A20-471B-AD81-8533F531995E}</ProjectGuid>
+    <RootNamespace>12_MeshClass_Del</RootNamespace>
+    <ProjectName>12_MeshClass_Del</ProjectName>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -106,11 +106,8 @@ xcopy "$(SolutionDir)include\Simplex\Shaders" "$(SolutionDir)_Binary\Shaders" /y
     <ClCompile Include="AppClassGUI.cpp" />
     <ClCompile Include="AppClassMain.cpp" />
     <ClCompile Include="ControllerConfiguration.cpp" />
-    <ClCompile Include="MyRigidBody.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="MyCamera.cpp" />
     <ClCompile Include="MyMesh.cpp" />
-    <ClCompile Include="MyMeshManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\imgui\imconfig.h" />
@@ -121,11 +118,8 @@ xcopy "$(SolutionDir)include\Simplex\Shaders" "$(SolutionDir)_Binary\Shaders" /y
     <ClInclude Include="AppClass.h" />
     <ClInclude Include="ControllerConfiguration.h" />
     <ClInclude Include="Definitions.h" />
-    <ClInclude Include="MyRigidBody.h" />
     <ClInclude Include="Main.h" />
-    <ClInclude Include="MyCamera.h" />
     <ClInclude Include="MyMesh.h" />
-    <ClInclude Include="MyMeshManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\res\BTO.rc" />
