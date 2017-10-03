@@ -11,7 +11,6 @@ Date: 2017/05
 #include "imgui\ImGuiObject.h"
 
 #include "MyMesh.h"
-#include "Transform.h"
 
 class Application
 {
