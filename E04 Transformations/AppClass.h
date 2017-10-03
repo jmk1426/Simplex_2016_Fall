@@ -11,10 +11,13 @@ Date: 2017/05
 #include "imgui\ImGuiObject.h"
 
 #include "MyMesh.h"
+#include "Transform.h"
 
 class Application
 {
 	MyMesh* m_pMesh = nullptr;
+	MyMesh* m_pMesh2 = nullptr;
+	std::vector<MyMesh*> meshObjects;
 	String m_sProgrammer = "Jason Ketcherside - jmk1426@g.rit.edu";
 
 private:
