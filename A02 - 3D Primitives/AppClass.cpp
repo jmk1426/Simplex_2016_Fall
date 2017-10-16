@@ -34,7 +34,7 @@ void Application::InitVariables(void)
 		m_pMesh->GenerateCube(2.0f, C_CYAN);
 		break;
 	case 1:
-		m_pMesh->GenerateCone(1.0f, 2.0f, 10, C_CYAN);
+		m_pMesh->GenerateCone(1.0f, 2.0f, 7, C_CYAN);
 		break;
 	case 2:
 		m_pMesh->GenerateCylinder(1.0f, 2.0f, 10, C_CYAN);

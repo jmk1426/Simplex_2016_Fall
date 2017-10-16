@@ -278,11 +278,36 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 	// Replace this with your code
 	//GenerateCube(a_fRadius * 2.0f, a_v3Color);
 	// -------------------------------
+<<<<<<< HEAD
 	// Draw as many tris as there are subdivisions
 	for (int i = 0; i < a_nSubdivisions; i++)
 	{
 
 	}
+=======
+	// Get the top and bottom points (they will be constant points)
+	vector3 bottomPoint(0, -(a_fHeight / 2), 0);
+	vector3 topPoint(0, a_fHeight / 2, 0);
+
+	// Iterate around the cone for all the subdivisions
+	for (int i = 0; i < a_nSubdivisions; ++i)
+	{
+		// Calculate the value to give to sin and cosine
+		float x = (i * ((2 * PI) / a_nSubdivisions));
+		float y = ((i + 1) * ((2 * PI) / a_nSubdivisions));
+
+		// Calculate the first point on the circle
+		vector3 point1(cos(x) * a_fRadius, bottomPoint.y, sin(x) * a_fRadius);
+
+		// Calculate the second point on the circle
+		vector3 point2(cos(y) * a_fRadius, bottomPoint.y, sin(y) * a_fRadius);
+
+		// Add 2 triangles, one with y = 0 and one with y = a_fHeight
+		AddTri(point2, bottomPoint, point1);
+		AddTri(point1, topPoint, point2);
+	}
+
+>>>>>>> 88339537e08e905cedd62684b24a9d28043ac31a
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
@@ -305,8 +330,43 @@ void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisi
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
+	//GenerateCube(a_fRadius * 2.0f, a_v3Color);
 	// -------------------------------
+	// Get the top and bottom points (they will be constants)
+	vector3 bottomPoint(0, -(a_fHeight / 2), 0);
+	vector3 topPoint(0, a_fHeight / 2, 0);
+
+	// Iterate around the cylinder for all the subdivisions
+	for (int i = 0; i < a_nSubdivisions; i++)
+	{
+		// Calculate the value to give to sin and cosine
+		float offsetX = 2 * PI * i;
+		float offsetY = 2 * PI * (i + 1);
+		float x = offsetX / a_nSubdivisions;
+		float y = offsetY / a_nSubdivisions;
+
+		// Calculate the two points on the top circle
+		// Calculate the first point on the circle
+		vector3 point1(cos(x) * a_fRadius, topPoint.y, sin(x) * a_fRadius);
+
+		// Calculate the second point on the circle
+		vector3 point2(cos(y) * a_fRadius, topPoint.y, sin(y) * a_fRadius);
+
+		// Calculate the two points on the bottom circle
+		// Calculate the first point on the circle
+		vector3 point3(cos(x) * a_fRadius, bottomPoint.y, sin(x) * a_fRadius);
+
+		// Calculate the second point on the circle
+		vector3 point4(cos(y) * a_fRadius, bottomPoint.y, sin(y) * a_fRadius);
+
+		// Add 2 triangles, one with y = 0 and one with y = a_fHeight
+		AddTri(point4, bottomPoint, point3);
+		AddTri(point1, topPoint, point2);
+
+		// Add the quad that makes up the body of the cylinder
+		AddQuad(point4, point3, point2, point1);
+
+	}
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
@@ -335,8 +395,56 @@ void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fH
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fOuterRadius * 2.0f, a_v3Color);
+	//GenerateCube(a_fOuterRadius * 2.0f, a_v3Color);
 	// -------------------------------
+	// Iterate around the tube for all the subdivisions
+	for (int i = 0; i < a_nSubdivisions; i++)
+	{
+		// Calculate the value to give to sin and cosine
+		float offsetX = 2 * PI * i;
+		float offsetY = 2 * PI * (i + 1);
+		float x = offsetX / a_nSubdivisions;
+		float y = offsetY / a_nSubdivisions;
+
+		// !! OUTER RADIUS !!
+		// Calculate the first point on the top
+		vector3 point1(cos(x) * a_fOuterRadius, a_fHeight / 2, sin(x) * a_fOuterRadius);
+
+		// Calculate the second point on the top
+		vector3 point2(cos(y) * a_fOuterRadius, a_fHeight / 2, sin(y) * a_fOuterRadius);
+
+		// Calculate the first point on the bottom
+		vector3 point3(cos(x) * a_fOuterRadius, -(a_fHeight / 2), sin(x) * a_fOuterRadius);
+
+		// Calculate the second point on the bottom
+		vector3 point4(cos(y) * a_fOuterRadius, -(a_fHeight / 2), sin(y) * a_fOuterRadius);
+
+		// !! INNER RADIUS !!
+		// Calculate the first point on the top
+		vector3 point5(cos(x) * a_fInnerRadius, a_fHeight / 2, sin(x) * a_fInnerRadius);
+
+		// Calculate the second point on the top
+		vector3 point6(cos(y) * a_fInnerRadius, a_fHeight / 2, sin(y) * a_fInnerRadius);
+
+		// Calculate the first point on the bottom
+		vector3 point7(cos(x) * a_fInnerRadius, -(a_fHeight / 2), sin(x) * a_fInnerRadius);
+
+		// Calculate the second point on the bottom
+		vector3 point8(cos(y) * a_fInnerRadius, -(a_fHeight / 2), sin(y) * a_fInnerRadius);
+
+		// Add the quad on the bottom of the tube first
+		AddQuad(point8, point7, point4, point3);
+
+		// Add the quad on the outside of the tube second
+		AddQuad(point4, point3, point2, point1);
+
+		// Add the quad on the top of the tube third
+		AddQuad(point2, point1, point6, point5);
+
+		// Add the quad on the inside of the tube last
+		AddQuad(point6, point5, point8, point7);
+		
+	}
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
@@ -392,8 +500,44 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
+	//GenerateCube(a_fRadius * 2.0f, a_v3Color);
 	// -------------------------------
+	// Get a top and bottom points (these will be constant)
+	vector3 topPoint(0, a_fRadius / 2, 0);
+	vector3 bottomPoint(0, -(a_fRadius / 2), 0);
+
+	// Fill out circles for the top and bottom of the sphere
+	for (int i = 0; i < a_nSubdivisions; i++)
+	{
+		// Calculate the values to give to sin and cosine
+		float offsetX = 2 * PI * i;
+		float offsetY = 2 * PI * (i + 1);
+		float x = offsetX / a_nSubdivisions;
+		float y = offsetY / a_nSubdivisions;
+
+		// Calculate the first point on the bottom circle
+		vector3 point1(cos(x) * a_fRadius, bottomPoint.y, sin(x) * a_fRadius);
+
+		// Calculate the second point on the bottom circle
+		vector3 point2(cos(y) * a_fRadius, bottomPoint.y, sin(y) * a_fRadius);
+
+		// Calculate the first point on the top circle
+		vector3 point3(cos(x) * a_fRadius, topPoint.y, sin(x) * a_fRadius);
+
+		// Calculate the second point on the top circle
+		vector3 point4(cos(y) * a_fRadius, topPoint.y, sin(y) * a_fRadius);
+
+		vector3 point5((point2.x) / 2, (point4.y) / 2, (point1.z) + 1);
+
+		// Add 2 triangles, one on the bottom of the sphere and one on the top
+		AddTri(point2, (bottomPoint + bottomPoint), point1);
+		AddTri(point3, (topPoint + topPoint), point4);	
+
+		// Add a quad to fill the space between the two circles
+		AddQuad(point2, point1, point4, point3);
+	}
+
+	
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);

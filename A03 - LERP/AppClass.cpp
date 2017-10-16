@@ -2,7 +2,7 @@
 void Application::InitVariables(void)
 {
 	////Change this to your name and email
-	//m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu";
+	m_sProgrammer = "Jason Ketcherside - jmk1426@rit.edu";
 
 	////Alberto needed this at this position for software recording.
 	//m_pWindow->setPosition(sf::Vector2i(710, 0));
@@ -21,6 +21,30 @@ void Application::InitVariables(void)
 		m_v4ClearColor = vector4(ZERO_V3, 1.0f);
 	}
 	
+	// Load in the number of orbits from the .ini file
+	// Set up a file io object
+	std::ifstream myFileName;
+
+	// Open the file
+	myFileName.open("A03 - LERP.ini");
+
+	// Create a variable
+	String wordFromFile;
+	// Search the file for the number of orbits
+	while (!myFileName.eof()) 
+	{
+		// Get a word from the file
+		myFileName >> wordFromFile;
+
+		// check the word received against the word you are looking for
+		if (wordFromFile == "Orbits:")
+		{
+			myFileName >> wordFromFile;
+			m_uOrbits = std::atoi(wordFromFile.c_str());
+			break;
+		}
+	}
+
 	//if there are no segments create 7
 	if(m_uOrbits < 1)
 		m_uOrbits = 7;
@@ -42,6 +66,40 @@ void Application::InitVariables(void)
 		fSize += 0.5f; //increment the size for the next orbit
 		uColor -= static_cast<uint>(decrements); //decrease the wavelength
 	}
+
+	// Calculate the various stops, start and end points needed
+	for (uint i = 0; i < m_uOrbits; i++)
+	{
+		// Set up a temporary list of to hold the stops in a current orbit
+		std::vector<vector3> newListOfStops;
+
+		// Start off with three different waypoints to hit, increment as you go through the loop
+		float waypoints = 3 + i;
+		// Use the radius to place each sphere on the correct orbit
+		float radius = 1 + (0.5 * i);
+		for (uint j = 0; j < waypoints; j++)
+		{
+			// Create a value that allows you to move from point to point along each orbit's path
+			// Similar to traveling around a circle and getting points on it
+			float switchPoints = (PI / 2) - ((j * (2 * PI)) / waypoints);
+
+			newListOfStops.push_back(vector3((sin(switchPoints) * radius), (cos(switchPoints) * radius), 0));
+		}
+
+		// Set up the list of starts and ends
+		startsList.push_back(newListOfStops[0]);
+		endsList.push_back(newListOfStops[1]);
+		// Push the new list of stops to the list that holds the list of stops (sorry)
+		varyingStopsList.push_back(newListOfStops);
+		// Add the new amount of paths to the list of paths form the current orbit
+		pathsList.push_back(i);
+ 
+	}
+
+	fTimer = 0;	//start the new timer at 0
+	uClock = m_pSystem->GenClock(); //generate a new clock for that timer
+	// Make a float for the max length of the animation between points
+	fMax = 1.0f;
 }
 void Application::Update(void)
 {
@@ -67,19 +125,52 @@ void Application::Display(void)
 	*/
 	//m4Offset = glm::rotate(IDENTITY_M4, 90.0f, AXIS_Z);
 
+
+	fTimer += m_pSystem->GetDeltaTime(uClock); //get the delta time for that timer
+
 	// draw a shapes
 	for (uint i = 0; i < m_uOrbits; ++i)
 	{
 		m_pMeshMngr->AddMeshToRenderList(m_shapeList[i], glm::rotate(m4Offset, 90.0f, AXIS_X));
 
+		// Make sure you are using the correct list of stops for the current orbit
+		stopsList = varyingStopsList[i];
+
+		// Start at the current path
+		startsList[i] = stopsList[pathsList[i]];
+
+		// End at the next path
+		// When we hit the final end point, path + 1 will throw an exception
+		// Using the modulus will allow us to reset to the first point when we hit the final end point
+		endsList[i] = stopsList[(pathsList[i] + 1) % stopsList.size()];
+
+		// The percentage will hold how close you are to the start and end of the path
+		// Map the value to be between 0.0 and 1.0
+		float fPercent = MapValue(fTimer, 0.0f, fMax, 0.0f, 1.0f);
+
 		//calculate the current position
-		vector3 v3CurrentPos = ZERO_V3;
-		matrix4 m4Model = glm::translate(m4Offset, v3CurrentPos);
+		// Use glm::lerp to get the linear interpolation between the start and end of the route
+		vector3 v3CurrentPos = glm::lerp(startsList[i], endsList[i], fPercent);
+		m4Model = glm::translate(m4Offset, v3CurrentPos);
+
+		// If the timer is greater than or equal to the maximum time of the animation, the animation needs to start again
+		if (fTimer >= fMax)
+		{
+			pathsList[i]++; // Go to the next path
+			pathsList[i] %= stopsList.size(); // Make sure we are within bounds of the vector
+		}
 
 		//draw spheres
 		m_pMeshMngr->AddSphereToRenderList(m4Model * glm::scale(vector3(0.1)), C_WHITE);
+
 	}
 
+	// Need to reset the timer outside of the loop because otherwise it will constantly be reset to 0
+	if (fTimer >= fMax)
+	{
+		fTimer = m_pSystem->GetDeltaTime(uClock); // Restart the timer
+	}
+	
 	//render list call
 	m_uRenderCallCount = m_pMeshMngr->Render();
 
