@@ -39,8 +39,13 @@ void Application::InitVariables(void)
 		// check the word received against the word you are looking for
 		if (wordFromFile == "Orbits:")
 		{
+			// If it is the correct word, you know that the next word is the value you need
+			// Get it from the file
 			myFileName >> wordFromFile;
+			// Set the amount of orbits equal to the amount set in the .ini file
+			// Needs to be parsed to an int as well
 			m_uOrbits = std::atoi(wordFromFile.c_str());
+			// Break out of the loop once you are done with the file
 			break;
 		}
 	}
@@ -77,21 +82,23 @@ void Application::InitVariables(void)
 		float waypoints = 3 + i;
 		// Use the radius to place each sphere on the correct orbit
 		float radius = 1 + (0.5 * i);
+		// Loop through the points on each orbit and add them to the list of stops
 		for (uint j = 0; j < waypoints; j++)
 		{
 			// Create a value that allows you to move from point to point along each orbit's path
 			// Similar to traveling around a circle and getting points on it
 			float switchPoints = (PI / 2) - ((j * (2 * PI)) / waypoints);
 
+			// Add each point to the list of stops
 			newListOfStops.push_back(vector3((sin(switchPoints) * radius), (cos(switchPoints) * radius), 0));
 		}
 
-		// Set up the list of starts and ends
+		// Set up the list of starts ing points and end points
 		startsList.push_back(newListOfStops[0]);
 		endsList.push_back(newListOfStops[1]);
 		// Push the new list of stops to the list that holds the list of stops (sorry)
 		varyingStopsList.push_back(newListOfStops);
-		// Add the new amount of paths to the list of paths form the current orbit
+		// Add the new amount of paths to the list of paths from the current orbit
 		pathsList.push_back(i);
  
 	}
@@ -126,7 +133,7 @@ void Application::Display(void)
 	//m4Offset = glm::rotate(IDENTITY_M4, 90.0f, AXIS_Z);
 
 
-	fTimer += m_pSystem->GetDeltaTime(uClock); //get the delta time for that timer
+	fTimer += m_pSystem->GetDeltaTime(uClock); //get the delta time for the timer
 
 	// draw a shapes
 	for (uint i = 0; i < m_uOrbits; ++i)
