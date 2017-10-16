@@ -1,5 +1,5 @@
 /*----------------------------------------------
-Programmer: Alberto Bobadilla (labigm@gmail.com)
+Programmer: Jason Ketcherside(jmk1426@rit.edu)
 Date: 2017/05
 ----------------------------------------------*/
 #ifndef __APPLICATIONCLASS_H_
@@ -20,7 +20,7 @@ class Application
 {
 	uint m_uOrbits = 0; //number of shapes starting at 3 and increasing in sides
 	std::vector<uint> m_shapeList; //shape index for circles
-	String m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu";
+	String m_sProgrammer = "Jason Ketcherside - labigm@rit.edu";
 	
 private:
 	static ImGuiObject gui; //GUI object
@@ -44,6 +44,18 @@ private:
 	CameraManager* m_pCameraMngr = nullptr; //Singleton for the camera manager
 	ControllerInput* m_pController[8]; //Controller
 	uint m_uActCont = 0; //Active Controller of the Application
+
+	float fTimer; // timer of the orbit length
+	uint uClock; // clock to be used with the timer
+	vector3 start; // the starting point of the current orbit
+	vector3 end; // the end point of the current orbit
+	int path = 0; // the segment of the orbit the sphere is currently on
+	std::vector<vector3> stopsList; // list of stops on the current orbit
+	std::vector<vector3> startsList; // list of starting points on the current orbit
+	std::vector<vector3> endsList; // list of end points on the current orbit
+	std::vector<std::vector<vector3>> varyingStopsList; // list of the list of different stops on each orbit 
+	matrix4 m4Model; // represents the model of the sphere
+
 
 public:
 #pragma region Constructor / Run / Destructor

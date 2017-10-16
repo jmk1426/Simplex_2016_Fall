@@ -2,7 +2,7 @@
 void Application::InitVariables(void)
 {
 	////Change this to your name and email
-	//m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu";
+	m_sProgrammer = "Jason Ketcherside - jmk1426@rit.edu";
 
 	////Alberto needed this at this position for software recording.
 	//m_pWindow->setPosition(sf::Vector2i(710, 0));
@@ -42,6 +42,33 @@ void Application::InitVariables(void)
 		fSize += 0.5f; //increment the size for the next orbit
 		uColor -= static_cast<uint>(decrements); //decrease the wavelength
 	}
+
+	// Calculate the various stops, start and end points needed
+	for (uint i = 0; i < m_uOrbits; i++)
+	{
+		// Set up a temporary list of to hold the stops in a current orbit
+		std::vector<vector3> newListOfStops;
+
+		for (uint j = 0; j < m_uOrbits; j++)
+		{
+			// Start off with three different waypoints to hit, increment as you go through the loop
+			float waypoints = 3 + i;
+			// Use the radius to place each sphere on the correct orbit
+			float radius = 1 + (0.5 * i);
+
+			// Create a value that allows you to move from point to point along each orbit's path
+			// Similar to traveling around a circle and getting points on it
+			float switchPoints = (j * (2 * PI)) / waypoints;
+
+			newListOfStops.push_back(vector3((sin(switchPoints) * radius), (cos(switchPoints) * radius), 0));
+		}
+
+		// Set up the list of starts and ends
+		startsList.push_back(newListOfStops[i]);
+		endsList.push_back(newListOfStops[i + 1]);
+		varyingStopsList.push_back(newListOfStops);
+ 
+	}
 }
 void Application::Update(void)
 {
@@ -67,17 +94,53 @@ void Application::Display(void)
 	*/
 	//m4Offset = glm::rotate(IDENTITY_M4, 90.0f, AXIS_Z);
 
+	// Get a timer that will determine how long the sphere should be on a certain segment in the orbit
+	fTimer = 0;	//store the new timer
+	uClock = m_pSystem->GenClock(); //generate a new clock for that timer
+	fTimer += m_pSystem->GetDeltaTime(uClock); //get the delta time for that timer
+
 	// draw a shapes
 	for (uint i = 0; i < m_uOrbits; ++i)
 	{
 		m_pMeshMngr->AddMeshToRenderList(m_shapeList[i], glm::rotate(m4Offset, 90.0f, AXIS_X));
 
-		//calculate the current position
-		vector3 v3CurrentPos = ZERO_V3;
-		matrix4 m4Model = glm::translate(m4Offset, v3CurrentPos);
+		// Loop through the different orbits
+		for (uint j = 0; j < m_uOrbits; j++)
+		{
+			// Make sure you are using the correct list of stops for the current orbit
+			stopsList = varyingStopsList[j];
+
+			// Start at the current path
+			startsList[j] = stopsList[path];
+
+			// End at the next path
+			// When we hit the final end point, path + 1 will throw an exception
+			// Using the modulus will allow us to reset to the first point when we hit the final end point
+			endsList[j] = stopsList[(path + 1) % stopsList.size()];
+
+			// The percentage will hold how close you are to the start and end of the path
+			// Make a float for the max length of the animation between points
+			float fMax = 3.0f;
+			// Map the value to be between 0.0 and 1.0
+			float fPercent = MapValue(fTimer, 0.0f, fMax, 0.0f, 1.0f);
+
+			//calculate the current position
+			// Use glm::lerp to get the linear interpolation between the start and end of the route
+			vector3 v3CurrentPos = glm::lerp(startsList[j], endsList[j], fPercent);
+			m4Model = glm::translate(m4Offset, v3CurrentPos);
+
+			// If the timer is greater than or equal to the maximum time of the animation, the animation needs to start again
+			if (fTimer >= fMax)
+			{
+				path++; // Go to the next path
+				fTimer = m_pSystem->GetDeltaTime(uClock); // Restart the timer
+				path %= stopsList.size(); // Make sure we are within bounds of the vector
+			}
+		}
 
 		//draw spheres
 		m_pMeshMngr->AddSphereToRenderList(m4Model * glm::scale(vector3(0.1)), C_WHITE);
+
 	}
 
 	//render list call
