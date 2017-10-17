@@ -278,13 +278,13 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 	// Replace this with your code
 	//GenerateCube(a_fRadius * 2.0f, a_v3Color);
 	// -------------------------------
-<<<<<<< HEAD
+//<<<<<<< HEAD
 	// Draw as many tris as there are subdivisions
 	for (int i = 0; i < a_nSubdivisions; i++)
 	{
 
 	}
-=======
+//=======
 	// Get the top and bottom points (they will be constant points)
 	vector3 bottomPoint(0, -(a_fHeight / 2), 0);
 	vector3 topPoint(0, a_fHeight / 2, 0);
@@ -307,7 +307,7 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 		AddTri(point1, topPoint, point2);
 	}
 
->>>>>>> 88339537e08e905cedd62684b24a9d28043ac31a
+//>>>>>>> 88339537e08e905cedd62684b24a9d28043ac31a
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
